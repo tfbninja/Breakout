@@ -26,7 +26,7 @@ public class Breakout extends Application {
 
     //DECLARE a static GameState object here (used in the timer)
     private static GameState gs;
-    private RedrawTimer timer = new RedrawTimer();
+    RedrawTimer timer = new RedrawTimer();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
