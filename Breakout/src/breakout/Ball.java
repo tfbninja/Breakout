@@ -130,12 +130,10 @@ public class Ball extends GameElement implements Renderable, Updateable {
                 double speed = new Vector(xVel, yVel).magnitude();
                 double relativeX = x + w / 2 - x1;
                 double ratio = relativeX / (w1 + w);
-                double newAngle = (180 - angleMargin) - ((180 - angleMargin * 2) * ratio);
-                double newXVel = Math.sin(newAngle) * speed;
-                double newYVel = Math.cos(newAngle) * speed;
-                Vector newV = new Vector(newXVel, newYVel);
-                //newXVel /= newV.magnitude();
-                //newYVel /= newV.magnitude();
+                double angle = (180 - angleMargin) - ((180 - angleMargin * 2) * ratio);
+                double newXVel = Math.cos(angle) * speed;
+                double newYVel = Math.sin(angle) * speed;
+
                 xVel = newXVel;
                 yVel = newYVel;
             } else if (hitBottomSide(obj)) {
