@@ -70,7 +70,7 @@ public class Breakout extends Application {
         gs.addCollidable(left);
         gs.addCollidable(right);
 
-        Ball ball = new Ball(WIDTH / 3, HEIGHT * 3 / 5, ballDiameter, ballColor, 3, 4);
+        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, 3, 4);
         Paddle paddle = new Paddle(WIDTH / 2, paddleY, paddleW, paddleH, paddleColor, paddleSpeed);
         gs.addCollidable(ball);
         gs.addRenderable(ball);

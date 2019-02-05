@@ -19,7 +19,7 @@ public class Ball extends GameElement implements Renderable, Updateable {
      * 180 - this number, and the rightmost angle is this number. Simply rotate
      * your imaginary unit circle for the other sides
      */
-    private static double angleMargin = 20;
+    private static double minAngle = 30;
 
     public Ball() {
         super();
@@ -121,19 +121,23 @@ public class Ball extends GameElement implements Renderable, Updateable {
         } else if (obj.getClass().equals(Paddle.class)) {
             if (this.hitLeftSide(obj)) {
                 //toggleXVel();
-//                double ratio = 
             } else if (hitRightSide(obj)) {
                 //toggleXVel();
             }
             if (this.hitTopSide(obj)) {
-                //toggleYVel();
-                double speed = new Vector(xVel, yVel).magnitude();
-                double relativeX = x + w / 2 - x1;
-                double ratio = relativeX / (w1 + w);
-                double angle = (180 - angleMargin) - ((180 - angleMargin * 2) * ratio);
-                double newXVel = Math.cos(angle) * speed;
-                double newYVel = Math.sin(angle) * speed;
-
+                Vector b = new Vector(xVel, yVel);
+                double newAngle = minAngle + (x - (x1 - w)) / (w1 + w) * (180 - minAngle * 2);
+                if (newAngle > 85 || newAngle < 95) {
+                    double diff = newAngle - 90;
+                    while (Math.abs(diff) < 15) {
+                        diff *= 1.2;
+                    }
+                    newAngle = 90 + diff;
+                }
+                System.out.println("New ball angle: " + newAngle);
+                double newXVel = -b.magnitude() * Math.cos(newAngle / 180 * Math.PI);
+                double newYVel = -b.magnitude() * Math.sin(newAngle / 180 * Math.PI);
+                System.out.println("slope is " + (newYVel / newXVel) + " (" + newXVel + ", " + newYVel + ")");
                 xVel = newXVel;
                 yVel = newYVel;
             } else if (hitBottomSide(obj)) {
