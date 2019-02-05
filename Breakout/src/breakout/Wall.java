@@ -10,8 +10,8 @@ public class Wall extends GameElement {
         super();
     }
 
-    public Wall(double x, double y) {
-        super(x, y, 1, 1);
+    public Wall(double x, double y, double w, double h) {
+        super(x, y, w, h);
     }
 
     @Override

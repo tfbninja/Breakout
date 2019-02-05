@@ -11,7 +11,6 @@ import javafx.scene.paint.Color;
 public class Paddle extends GameElement implements Renderable, Updateable {
 
     private Color color = Color.WHITE;
-    private double speed;
     private double velocity = 0.0;
     private double maxVel;
 
@@ -22,11 +21,19 @@ public class Paddle extends GameElement implements Renderable, Updateable {
     public Paddle(double x, double y, double w, double h, Color color, double speed) {
         super(x, y, w, h);
         this.color = color;
-        this.speed = speed;
+        this.maxVel = speed;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public double getMaxSpeed() {
-        return speed;
+        return maxVel;
     }
 
     public double getVelocity() {
@@ -34,11 +41,23 @@ public class Paddle extends GameElement implements Renderable, Updateable {
     }
 
     public void setSpeed(double amt) {
-        speed = amt;
+        maxVel = amt;
     }
 
     public void setVelocity(double amt) {
         velocity = amt;
+    }
+
+    public void goRight() {
+        velocity = maxVel;
+    }
+
+    public void goLeft() {
+        velocity = -maxVel;
+    }
+
+    public void stop() {
+        velocity = 0.0;
     }
 
     @Override
@@ -50,7 +69,7 @@ public class Paddle extends GameElement implements Renderable, Updateable {
 
     @Override
     public void onCollision(GameElement obj) {
-        return;
+        System.out.println(this.getClass().getSimpleName() + " has collided with " + obj.getClass().getSimpleName());
     }
 
     @Override

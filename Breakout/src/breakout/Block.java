@@ -8,10 +8,12 @@ import javafx.scene.canvas.GraphicsContext;
  *
  * @author Tim Barber
  */
-public class Block extends GameElement implements Renderable {
+public class Block extends GameElement implements Renderable, Updateable {
 
     private boolean exists = true;
     private Color color = Color.WHITE;
+    private int hitCount = 0;
+    private int maxHits = 1;
 
     public Block() {
         super();
@@ -20,6 +22,26 @@ public class Block extends GameElement implements Renderable {
     public Block(double x, double y, double w, double h, Color color) {
         super(x, y, w, h);
         this.color = color;
+    }
+
+    public void setMaxHits(int amt) {
+        maxHits = amt;
+    }
+
+    public int getHitCount() {
+        return hitCount;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public boolean exists() {
+        return exists;
     }
 
     public void destroy() {
@@ -39,18 +61,22 @@ public class Block extends GameElement implements Renderable {
         }
     }
 
-    @Override
-    public void onCollision(GameElement obj) {
-        if (!obj.getClass().equals(Ball.class.getClass())) {
-
-        } else {
+    public void update() {
+        if (hitCount >= maxHits) {
             destroy();
         }
     }
 
     @Override
-    public boolean checkCollision(GameElement obj) {
-        return false;
+    public void onCollision(GameElement obj) {
+        if (exists) {
+            System.out.println(this.getClass().getSimpleName() + " has collided with " + obj.getClass().getSimpleName());
+            if (!obj.getClass().equals(Ball.class)) {
+
+            } else {
+                hitCount++;
+            }
+        }
     }
 }
 

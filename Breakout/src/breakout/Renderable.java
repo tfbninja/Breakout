@@ -1,12 +1,17 @@
 package breakout;
 
 import javafx.scene.canvas.Canvas;
+import javafx.scene.paint.Color;
 
 /**
  *
  * @author Tim Barber
  */
 public interface Renderable {
+
+    void setColor(Color color);
+
+    Color getColor();
 
     void draw(Canvas canvas);
 }

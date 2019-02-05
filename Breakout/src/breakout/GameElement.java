@@ -1,5 +1,7 @@
 package breakout;
 
+import javafx.scene.paint.Color;
+
 /**
  *
  * @author Tim Barber
@@ -64,7 +66,20 @@ public abstract class GameElement {
 
     public abstract void onCollision(GameElement obj);
 
-    public abstract boolean checkCollision(GameElement obj);
+    public boolean checkCollision(GameElement obj) {
+        double x1 = obj.getX(), y1 = obj.getY(), w1 = obj.getW(), h1 = obj.getH();
+        if (x + w >= x1 && x <= x1 + w1) {
+            if (y + h >= y1 && y <= y1 + h1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return x + " " + y + " " + w + " " + h;
+    }
 }
 
 /*
