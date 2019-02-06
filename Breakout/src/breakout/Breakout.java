@@ -27,32 +27,41 @@ public class Breakout extends Application {
     private static Canvas canvas;
     private static final Color bg = Color.BLACK;
 
-    private double ballDiameter = 22.0;
-    private Color ballColor = Color.SPRINGGREEN;
-    private double paddleY = HEIGHT * 6 / 7;
-    private double paddleW = 100;
-    private double paddleH = 20;
-    private Color paddleColor = Color.PURPLE;
-    private double paddleSpeed = 6.0;
+    private final double ballDiameter = 22.0;
+    private final Color ballColor = Color.SPRINGGREEN;
+    private final double paddleY = HEIGHT * 6 / 7;
+    private final double paddleW = 100;
+    private final double paddleH = 20;
+    private final Color paddleColor = Color.PURPLE;
+    private final double paddleSpeed = 6.0;
+    private final double ballSpeedIncreaseRatio = 1.01;
 
-    private double blockH = 20;
-    private double blockYMargin = 2.0;
-    private double blockXMargin = 3.0;
-    private int[] numBlocksPerRow = {5, 7, 18};
-    private double initialBlockY = 180;
-    private double[] blockYPositions = {initialBlockY, initialBlockY + blockH + blockYMargin, initialBlockY + blockH * 2 + blockYMargin * 2};
-    private ArrayList<ColorBlock> blocks = new ArrayList<>();
-    private ArrayList<Color> blockColors = new ArrayList<Color>() {
-        {
-            add(Color.MAROON);
-            add(Color.ORANGERED);
-            add(Color.GOLD);
-        }
-    };
+    private final double blockH = 20;
+    private final double blockYMargin = 2.0;
+    private final double blockXMargin = 3.0;
+    private final int[] numBlocksPerRow = {5, 7, 18};
+    private final double initialBlockY = 180;
+    private final int rows = 5;
+    private final ArrayList<ColorBlock> blocks;
+    private final ArrayList<Color> blockColors;
 
     //DECLARE a static GameState object here (used in the timer)
     private static GameState gs;
     RedrawTimer timer = new RedrawTimer();
+
+    public Breakout() {
+        this.blockColors = new ArrayList<Color>() {
+            {
+                add(Color.MAROON);
+                add(Color.ORANGERED);
+                add(Color.GOLD);
+                add(Color.GREENYELLOW);
+                add(Color.DODGERBLUE);
+                add(Color.DARKMAGENTA);
+            }
+        };
+        this.blocks = new ArrayList<>();
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -61,16 +70,16 @@ public class Breakout extends Application {
         root.getChildren().add(canvas);
 
         gs = new GameState();
-        Wall top = new Wall(0, -1, WIDTH, 1);
-        Wall bottom = new Wall(0, HEIGHT, WIDTH, 1);
-        Wall left = new Wall(-1, 0, 1, HEIGHT);
-        Wall right = new Wall(WIDTH, 0, 1, HEIGHT);
+        Wall top = new Wall(0, -100, WIDTH, 100);
+        Wall bottom = new Wall(0, HEIGHT, WIDTH, 100);
+        Wall left = new Wall(-100, 0, 100, HEIGHT);
+        Wall right = new Wall(WIDTH, 0, 100, HEIGHT);
         gs.addCollidable(top);
         gs.addCollidable(bottom);
         gs.addCollidable(left);
         gs.addCollidable(right);
 
-        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, 3, 4);
+        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, 3, 4, ballSpeedIncreaseRatio);
         Paddle paddle = new Paddle(WIDTH / 2, paddleY, paddleW, paddleH, paddleColor, paddleSpeed);
         gs.addCollidable(ball);
         gs.addRenderable(ball);
@@ -79,11 +88,11 @@ public class Breakout extends Application {
         gs.addRenderable(paddle);
         gs.addUpdateable(paddle);
 
-        for (int row = 0; row < blockYPositions.length; row++) {
-            double yPos = blockYPositions[row];
-            double blockWidth = (WIDTH - (numBlocksPerRow[row] + 1) * blockXMargin) / numBlocksPerRow[row];
+        for (int row = 0; row < rows; row++) {
+            double yPos = initialBlockY + blockH * row + blockYMargin * row;
+            double blockWidth = (WIDTH - (numBlocksPerRow[row % numBlocksPerRow.length] + 1) * blockXMargin) / numBlocksPerRow[row % numBlocksPerRow.length];
             for (double x = blockXMargin; x < WIDTH - blockWidth; x += blockWidth + blockXMargin) {
-                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, blockH, ColorBlock.MODE_STATIC, blockColors.get(row));
+                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, blockH, ColorBlock.MODE_STATIC, blockColors.get(row % blockColors.size()));
                 blocks.add(temp);
                 gs.addCollidable(temp);
                 gs.addRenderable(temp);

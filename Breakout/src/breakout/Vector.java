@@ -35,6 +35,10 @@ public class Vector {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
+    public static double magnitude(double x, double y) {
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
     public double dot(Vector other) {
         return x * other.x + y * other.y;
     }

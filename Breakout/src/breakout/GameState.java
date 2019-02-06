@@ -20,7 +20,6 @@ Include a collideAll method that invokes the collision detection.
     private ArrayList<GameElement> gameElements = new ArrayList<>();
 
     public GameState() {
-
     }
 
     public void addRenderable(Renderable r) {

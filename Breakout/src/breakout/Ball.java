@@ -13,23 +13,52 @@ public class Ball extends GameElement implements Renderable, Updateable {
     private Color color = Color.WHITE;
     private double xVel;
     private double yVel;
+    private double speed;
 
     /*
      * If the ball hits the top of a block, the leftmost angle it can go is
      * 180 - this number, and the rightmost angle is this number. Simply rotate
      * your imaginary unit circle for the other sides
      */
-    private static double minAngle = 30;
+    private static double minAngle = 20;
+
+    private double ballSpeedIncreaseRatio;
 
     public Ball() {
         super();
     }
 
-    public Ball(double x, double y, double d, Color color, double xVel, double yVel) {
+    public Ball(double x, double y, double d, Color color, double xVel, double yVel, double ballSpeedIncreaseRatio) {
         super(x, y, d, d);
         this.color = color;
         this.xVel = xVel;
         this.yVel = yVel;
+        this.ballSpeedIncreaseRatio = ballSpeedIncreaseRatio;
+    }
+
+    public void setNewVelocity(double amt) {
+        speed = amt;
+        correctVelocities();
+    }
+
+    public void scaleVelocity(double scalar) {
+        speed = Vector.magnitude(xVel, yVel);
+        speed *= scalar;
+        correctVelocities();
+    }
+
+    public void setNewVelocity(double x, double y) {
+        xVel = x;
+        yVel = y;
+        speed = Vector.magnitude(xVel, yVel);
+    }
+
+    public void correctVelocities() {
+        double oldSpeed = Vector.magnitude(xVel, yVel);
+        double ratio = speed / oldSpeed;
+        xVel *= ratio;
+        yVel *= ratio;
+        System.out.println("(" + xVel + ", " + yVel + ")");
     }
 
     @Override
@@ -111,14 +140,15 @@ public class Ball extends GameElement implements Renderable, Updateable {
         double x = super.getX(), y = super.getY(), w = super.getW(), h = super.getH();
         double x1 = obj.getX(), y1 = obj.getY(), w1 = obj.getW(), h1 = obj.getH();
         if (obj.getClass().equals(Wall.class)) {
-            if (obj.getW() == 1) {
-                // if its a vertical wall
-                toggleXVel();
+            if ((x <= x1 + w1 && x >= x1 || x + w >= x1 && x1 + w1 >= x) && !(y < y1 + h1 && y + h > y1)) {
+                xVel = Math.abs(xVel) * (x - x1) / Math.abs(x - x1);
+                System.out.println("x: " + xVel);
             } else {
-                // if it's not a vertical wall, it's a horizontal one
-                toggleYVel();
+                yVel = Math.abs(yVel) * (y - y1) / Math.abs(y - y1);
+                System.out.println("y: " + yVel);
             }
         } else if (obj.getClass().equals(Paddle.class)) {
+            scaleVelocity(this.ballSpeedIncreaseRatio);
             if (this.hitLeftSide(obj)) {
                 //toggleXVel();
             } else if (hitRightSide(obj)) {
@@ -134,10 +164,8 @@ public class Ball extends GameElement implements Renderable, Updateable {
                     }
                     newAngle = 90 + diff;
                 }
-                System.out.println("New ball angle: " + newAngle);
                 double newXVel = -b.magnitude() * Math.cos(newAngle / 180 * Math.PI);
                 double newYVel = -b.magnitude() * Math.sin(newAngle / 180 * Math.PI);
-                System.out.println("slope is " + (newYVel / newXVel) + " (" + newXVel + ", " + newYVel + ")");
                 xVel = newXVel;
                 yVel = newYVel;
             } else if (hitBottomSide(obj)) {
@@ -145,9 +173,10 @@ public class Ball extends GameElement implements Renderable, Updateable {
             }
         } else {
             if (this.hitLeftSide(obj) || hitRightSide(obj)) {
+                scaleVelocity(this.ballSpeedIncreaseRatio);
                 toggleXVel();
-            }
-            if (this.hitTopSide(obj) || hitBottomSide(obj)) {
+            } else if (this.hitTopSide(obj) || hitBottomSide(obj)) {
+                scaleVelocity(this.ballSpeedIncreaseRatio);
                 toggleYVel();
             }
         }
