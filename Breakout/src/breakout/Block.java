@@ -28,6 +28,10 @@ public class Block extends GameElement implements Renderable, Updateable {
         maxHits = amt;
     }
 
+    public int getMaxHits() {
+        return maxHits;
+    }
+
     public int getHitCount() {
         return hitCount;
     }

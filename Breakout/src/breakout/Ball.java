@@ -14,6 +14,7 @@ public class Ball extends GameElement implements Renderable, Updateable {
     private double xVel;
     private double yVel;
     private double speed;
+    private double topSpeed;
 
     /*
      * If the ball hits the top of a block, the leftmost angle it can go is
@@ -28,12 +29,13 @@ public class Ball extends GameElement implements Renderable, Updateable {
         super();
     }
 
-    public Ball(double x, double y, double d, Color color, double xVel, double yVel, double ballSpeedIncreaseRatio) {
+    public Ball(double x, double y, double d, Color color, double xVel, double yVel, double ballSpeedIncreaseRatio, double topSpeed) {
         super(x, y, d, d);
         this.color = color;
         this.xVel = xVel;
         this.yVel = yVel;
         this.ballSpeedIncreaseRatio = ballSpeedIncreaseRatio;
+        this.topSpeed = topSpeed;
     }
 
     public void setNewVelocity(double amt) {
@@ -55,6 +57,9 @@ public class Ball extends GameElement implements Renderable, Updateable {
 
     public void correctVelocities() {
         double oldSpeed = Vector.magnitude(xVel, yVel);
+        if (speed > topSpeed) {
+            speed = topSpeed;
+        }
         double ratio = speed / oldSpeed;
         xVel *= ratio;
         yVel *= ratio;
@@ -165,7 +170,7 @@ public class Ball extends GameElement implements Renderable, Updateable {
                     newAngle = 90 + diff;
                 }
                 double newXVel = -b.magnitude() * Math.cos(newAngle / 180 * Math.PI);
-                double newYVel = -b.magnitude() * Math.sin(newAngle / 180 * Math.PI);
+                double newYVel = -Math.abs(b.magnitude() * Math.sin(newAngle / 180 * Math.PI));
                 xVel = newXVel;
                 yVel = newYVel;
             } else if (hitBottomSide(obj)) {

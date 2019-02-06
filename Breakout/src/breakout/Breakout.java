@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import javafx.stage.Stage;
 
 /**
@@ -30,36 +31,28 @@ public class Breakout extends Application {
     private final double ballDiameter = 22.0;
     private final Color ballColor = Color.SPRINGGREEN;
     private final double paddleY = HEIGHT * 6 / 7;
-    private final double paddleW = 100;
+    private final double paddleW = 200;
     private final double paddleH = 20;
     private final Color paddleColor = Color.PURPLE;
-    private final double paddleSpeed = 6.0;
-    private final double ballSpeedIncreaseRatio = 1.01;
+
+    private final double ballXVel = 8;
+    private final double ballYVel = 6.7;
+    private final double topBallSpeed = Vector.magnitude(ballXVel * 2, ballYVel * 2);
+    private final double paddleSpeed = topBallSpeed * 2 / 3;
+    private final double ballSpeedIncreaseRatio = 1.001;
 
     private final double blockH = 20;
     private final double blockYMargin = 2.0;
     private final double blockXMargin = 3.0;
-    private final int[] numBlocksPerRow = {5, 7, 18};
+    private final int[] numBlocksPerRow = {5, 7, 13, 15, 19};
     private final double initialBlockY = 180;
     private final int rows = 5;
     private final ArrayList<ColorBlock> blocks;
-    private final ArrayList<Color> blockColors;
 
-    //DECLARE a static GameState object here (used in the timer)
     private static GameState gs;
     RedrawTimer timer = new RedrawTimer();
 
     public Breakout() {
-        this.blockColors = new ArrayList<Color>() {
-            {
-                add(Color.MAROON);
-                add(Color.ORANGERED);
-                add(Color.GOLD);
-                add(Color.GREENYELLOW);
-                add(Color.DODGERBLUE);
-                add(Color.DARKMAGENTA);
-            }
-        };
         this.blocks = new ArrayList<>();
     }
 
@@ -79,7 +72,7 @@ public class Breakout extends Application {
         gs.addCollidable(left);
         gs.addCollidable(right);
 
-        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, 3, 4, ballSpeedIncreaseRatio);
+        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, ballXVel, ballYVel, ballSpeedIncreaseRatio, topBallSpeed);
         Paddle paddle = new Paddle(WIDTH / 2, paddleY, paddleW, paddleH, paddleColor, paddleSpeed);
         gs.addCollidable(ball);
         gs.addRenderable(ball);
@@ -92,7 +85,7 @@ public class Breakout extends Application {
             double yPos = initialBlockY + blockH * row + blockYMargin * row;
             double blockWidth = (WIDTH - (numBlocksPerRow[row % numBlocksPerRow.length] + 1) * blockXMargin) / numBlocksPerRow[row % numBlocksPerRow.length];
             for (double x = blockXMargin; x < WIDTH - blockWidth; x += blockWidth + blockXMargin) {
-                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, blockH, ColorBlock.MODE_STATIC, blockColors.get(row % blockColors.size()));
+                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, blockH, rows - row);
                 blocks.add(temp);
                 gs.addCollidable(temp);
                 gs.addRenderable(temp);
