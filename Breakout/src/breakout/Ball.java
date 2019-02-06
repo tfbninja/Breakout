@@ -140,12 +140,12 @@ public class Ball extends GameElement implements Renderable, Updateable {
         double x = super.getX(), y = super.getY(), w = super.getW(), h = super.getH();
         double x1 = obj.getX(), y1 = obj.getY(), w1 = obj.getW(), h1 = obj.getH();
         if (obj.getClass().equals(Wall.class)) {
-            if ((x <= x1 + w1 && x >= x1 || x + w >= x1 && x1 + w1 >= x) && !(y < y1 + h1 && y + h > y1)) {
+            if (w1 == 100) {
                 xVel = Math.abs(xVel) * (x - x1) / Math.abs(x - x1);
-                System.out.println("x: " + xVel);
+                //System.out.println("x: " + xVel);
             } else {
                 yVel = Math.abs(yVel) * (y - y1) / Math.abs(y - y1);
-                System.out.println("y: " + yVel);
+                //System.out.println("y: " + yVel);
             }
         } else if (obj.getClass().equals(Paddle.class)) {
             scaleVelocity(this.ballSpeedIncreaseRatio);
