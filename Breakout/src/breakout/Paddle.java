@@ -50,6 +50,7 @@ public class Paddle extends GameElement implements Renderable, Updateable {
 
     public void goRight() {
         velocity = maxVel;
+
     }
 
     public void goLeft() {

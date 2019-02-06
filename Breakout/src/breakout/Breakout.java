@@ -11,8 +11,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import java.util.ArrayList;
-import java.util.Collections;
 import javafx.stage.Stage;
 
 /**
@@ -27,32 +27,33 @@ public class Breakout extends Application {
     private static final int WIDTH = 900;
     private static final int HEIGHT = 600;
     private static Canvas canvas;
-    private static final Color bg = Color.BLACK.brighter();
+    private static final Color BG = Color.BLACK.brighter();
 
-    private final double ballDiameter = 22.0;
-    private final Color ballColor = Color.LIGHTGRAY.darker();
-    private final double ballX = WIDTH / 3;
-    private final double ballY = HEIGHT / 2;
-    private final double paddleY = HEIGHT * 6 / 7;
-    private final double paddleW = 200;
-    private final double paddleH = 20;
-    private final Color paddleColor = Color.PALEVIOLETRED;
-
-    private final double ballXVel = 8;
-    private final double ballYVel = 6.7;
-    private final double topBallSpeed = Vector.magnitude(ballXVel * 2, ballYVel * 2);
-    private final double paddleSpeed = topBallSpeed * 2 / 3;
-    private final double ballSpeedIncreaseRatio = 1.001;
-
-    private final double blockH = 20;
-    private final double blockYMargin = 2.0;
-    private final double blockXMargin = 3.0;
-    private final int[] numBlocksPerRow = {5, 7, 13, 15, 19};
-    private final double initialBlockY = 180;
-    private final int rows = 5;
-    private final ArrayList<ColorBlock> blocks;
-    private Ball ball;
+    private static final double BALLDIAMETER = 22.0;
+    private static final Color BALLCOLOR = Color.LIGHTGRAY.darker();
+    private static final double BALLX = WIDTH / 3;
+    private static final double BALLY = HEIGHT / 2;
+    private static final double PADDLEY = HEIGHT * 6 / 7;
+    private static final double PADDLEW = 200;
+    private static final double PADDLEH = 20;
+    private static final Color PADDLECOLOR = Color.PALEVIOLETRED;
+    private static final double BALLXVEL = 8;
+    private static final double BALLYVEL = 6.7;
+    private static final double TOPBALLSPEED = Vector.magnitude(BALLXVEL * 2, BALLYVEL * 2);
+    private static final double PADDLESPEED = TOPBALLSPEED * 2 / 3;
+    private static final double BALLSPEEDINCREASERATIO = 1.001;
+    private static final double BLOCKH = 20;
+    private static final double BLOCKYMARGIN = 2.0;
+    private static final double BLOCKXMARGIN = 3.0;
+    private static final int[] NUMBLOCKSPERROW = {5, 7, 13, 15, 19};
+    private static final double INITIALBLOCKY = 180;
+    private static final int ROWS = 5;
+    private static int lives = 3;
+    private static ArrayList<ColorBlock> blocks;
+    private static Ball ball;
     private Wall bottom;
+    private static int frame = 0;
+    private static boolean win = false;
 
     private static GameState gs;
     RedrawTimer timer = new RedrawTimer();
@@ -77,8 +78,8 @@ public class Breakout extends Application {
         gs.addCollidable(left);
         gs.addCollidable(right);
 
-        ball = new Ball(ballX, ballY, ballDiameter, ballColor, ballXVel, ballYVel, ballSpeedIncreaseRatio, topBallSpeed);
-        Paddle paddle = new Paddle(WIDTH / 2, paddleY, paddleW, paddleH, paddleColor, paddleSpeed);
+        ball = new Ball(BALLX, BALLY, BALLDIAMETER, BALLCOLOR, BALLXVEL, BALLYVEL, BALLSPEEDINCREASERATIO, TOPBALLSPEED);
+        Paddle paddle = new Paddle(WIDTH / 2, PADDLEY, PADDLEW, PADDLEH, PADDLECOLOR, PADDLESPEED);
         gs.addCollidable(ball);
         gs.addRenderable(ball);
         gs.addUpdateable(ball);
@@ -86,15 +87,16 @@ public class Breakout extends Application {
         gs.addRenderable(paddle);
         gs.addUpdateable(paddle);
 
-        for (int row = 0; row < rows; row++) {
-            double yPos = initialBlockY + blockH * row + blockYMargin * row;
-            double blockWidth = (WIDTH - (numBlocksPerRow[row % numBlocksPerRow.length] + 1) * blockXMargin) / numBlocksPerRow[row % numBlocksPerRow.length];
-            for (double x = blockXMargin; x < WIDTH - blockWidth; x += blockWidth + blockXMargin) {
-                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, blockH, rows - row);
+        for (int row = 0; row < ROWS; row++) {
+            double yPos = INITIALBLOCKY + BLOCKH * row + BLOCKYMARGIN * row;
+            double blockWidth = (WIDTH - (NUMBLOCKSPERROW[row % NUMBLOCKSPERROW.length] + 1) * BLOCKXMARGIN) / NUMBLOCKSPERROW[row % NUMBLOCKSPERROW.length];
+            for (double x = BLOCKXMARGIN; x < WIDTH - blockWidth; x += blockWidth + BLOCKXMARGIN) {
+                ColorBlock temp = new ColorBlock(x, yPos, blockWidth, BLOCKH, ROWS - row);
                 blocks.add(temp);
                 gs.addCollidable(temp);
                 gs.addRenderable(temp);
                 gs.addUpdateable(temp);
+                gs.addBreakable(temp);
             }
         }
 
@@ -107,11 +109,18 @@ public class Breakout extends Application {
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.RIGHT) {
                     //set the paddle to move to the right
-                    paddle.goRight();
+                    if (paddle.getX() + paddle.getW() * 0.5 < WIDTH) {
+                        paddle.goRight();
+                    }
                 }
                 if (event.getCode() == KeyCode.LEFT) {
                     //set the paddle to move to the left
-                    paddle.goLeft();
+                    if (paddle.getX() + paddle.getW() * 0.5 > 0) {
+                        paddle.goLeft();
+                    }
+                }
+                if (event.getCode() == KeyCode.R) {
+                    reset();
                 }
             }
 
@@ -121,18 +130,31 @@ public class Breakout extends Application {
                 if (event.getCode() == KeyCode.RIGHT) {
                     //set the paddle to not move
                     paddle.stop();
+
                 }
                 if (event.getCode() == KeyCode.LEFT) {
                     //set the paddle to not more
                     paddle.stop();
                 }
             }
-        });
+        }
+        );
         scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+
             public void handle(MouseEvent event) {
                 paddle.setX(event.getX() - paddle.getW() / 2);
             }
         });
+    }
+
+    public static void reset() {
+        gs.reset();
+        ball.setX(BALLX);
+        ball.setY(BALLY);
+        ball.setXVel(BALLXVEL);
+        ball.setYVel(BALLYVEL);
+        win = false;
+        frame = 0;
     }
 
     public static void main(String[] args) {
@@ -143,17 +165,34 @@ public class Breakout extends Application {
     public class RedrawTimer extends AnimationTimer {
 
         public void handle(long now) {
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.setFill(bg);
-            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            if (!win) {
+                frame++;
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                gc.setFill(BG);
+                gc.fillRect(0, 0, WIDTH, HEIGHT);
+                gc.setFont(new Font("VERDANA", 20));
+                gc.setFill(Color.WHITE);
+                gc.fillText("LIVES: " + lives, 10, 30);
 
-            gs.collideAll();
-            if (ball.hitTopSide(bottom)) {
-                ball.setX(ballX);
-                ball.setY(ballY);
+                gs.collideAll();
+                if (ball.hitTopSide(bottom)) {
+                    ball.setX(BALLX);
+                    ball.setY(BALLY);
+                    lives--;
+                }
+                if (lives < 0) {
+                    reset();
+                    lives = 3;
+                }
+                if (!gs.blockStillExists()) {
+                    gc.setFill(Color.RED);
+                    gc.setFont(new Font("Impact", 50));
+                    gc.fillText("YOU WIN", WIDTH / 2 - 100, HEIGHT / 2 + 25);
+                    win = true;
+                }
+                gs.updateAll();
+                gs.drawAll(canvas);
             }
-            gs.updateAll();
-            gs.drawAll(canvas);
         }
     }
 

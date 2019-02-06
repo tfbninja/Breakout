@@ -10,7 +10,6 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class Block extends GameElement implements Renderable, Updateable {
 
-    private boolean exists = true;
     private Color color = Color.WHITE;
     private int hitCount = 0;
     private int maxHits = 1;
@@ -44,21 +43,9 @@ public class Block extends GameElement implements Renderable, Updateable {
         this.color = color;
     }
 
-    public boolean exists() {
-        return exists;
-    }
-
-    public void destroy() {
-        exists = false;
-        super.setH(0);
-        super.setW(0);
-        super.setY(0);
-        super.setX(0);
-    }
-
     @Override
     public void draw(Canvas canvas) {
-        if (exists) {
+        if (exists()) {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             gc.setFill(color);
             gc.fillRect(super.getX(), super.getY(), super.getW(), super.getH());
@@ -73,7 +60,7 @@ public class Block extends GameElement implements Renderable, Updateable {
 
     @Override
     public void onCollision(GameElement obj) {
-        if (exists) {
+        if (exists()) {
             System.out.println(this.getClass().getSimpleName() + " has collided with " + obj.getClass().getSimpleName());
             if (!obj.getClass().equals(Ball.class)) {
 

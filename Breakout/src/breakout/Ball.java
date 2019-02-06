@@ -164,7 +164,7 @@ public class Ball extends GameElement implements Renderable, Updateable {
                 double newAngle = minAngle + (x - (x1 - w)) / (w1 + w) * (180 - minAngle * 2);
                 if (newAngle > 85 || newAngle < 95) {
                     double diff = newAngle - 90;
-                    while (Math.abs(diff) < 15) {
+                    while (Math.abs(diff) < 7.5) {
                         diff *= 1.2;
                     }
                     newAngle = 90 + diff;

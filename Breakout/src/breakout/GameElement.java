@@ -12,9 +12,11 @@ public abstract class GameElement {
     private double y;
     private double w;
     private double h;
+    private boolean exists;
 
     public GameElement() {
         x = y = w = h = 0;
+        exists = true;
     }
 
     public GameElement(double x, double y, double w, double h) {
@@ -22,6 +24,7 @@ public abstract class GameElement {
         this.y = y;
         this.w = w;
         this.h = h;
+        exists = true;
     }
 
     public double getX() {
@@ -38,6 +41,10 @@ public abstract class GameElement {
 
     public double getH() {
         return h;
+    }
+
+    public boolean exists() {
+        return exists;
     }
 
     public void setX(double amt) {
@@ -62,6 +69,14 @@ public abstract class GameElement {
 
     public void changeY(double amt) {
         y += amt;
+    }
+
+    public void destroy() {
+        exists = false;
+    }
+
+    public void reincarnate() {
+        exists = true;
     }
 
     public abstract void onCollision(GameElement obj);
