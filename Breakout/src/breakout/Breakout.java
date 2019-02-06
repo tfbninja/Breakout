@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -26,14 +27,16 @@ public class Breakout extends Application {
     private static final int WIDTH = 900;
     private static final int HEIGHT = 600;
     private static Canvas canvas;
-    private static final Color bg = Color.BLACK;
+    private static final Color bg = Color.BLACK.brighter();
 
     private final double ballDiameter = 22.0;
-    private final Color ballColor = Color.SPRINGGREEN;
+    private final Color ballColor = Color.LIGHTGRAY.darker();
+    private final double ballX = WIDTH / 3;
+    private final double ballY = HEIGHT / 2;
     private final double paddleY = HEIGHT * 6 / 7;
     private final double paddleW = 200;
     private final double paddleH = 20;
-    private final Color paddleColor = Color.PURPLE;
+    private final Color paddleColor = Color.PALEVIOLETRED;
 
     private final double ballXVel = 8;
     private final double ballYVel = 6.7;
@@ -48,6 +51,8 @@ public class Breakout extends Application {
     private final double initialBlockY = 180;
     private final int rows = 5;
     private final ArrayList<ColorBlock> blocks;
+    private Ball ball;
+    private Wall bottom;
 
     private static GameState gs;
     RedrawTimer timer = new RedrawTimer();
@@ -64,7 +69,7 @@ public class Breakout extends Application {
 
         gs = new GameState();
         Wall top = new Wall(0, -100, WIDTH, 100);
-        Wall bottom = new Wall(0, HEIGHT, WIDTH, 100);
+        bottom = new Wall(0, HEIGHT, WIDTH, 100);
         Wall left = new Wall(-100, 0, 100, HEIGHT);
         Wall right = new Wall(WIDTH, 0, 100, HEIGHT);
         gs.addCollidable(top);
@@ -72,7 +77,7 @@ public class Breakout extends Application {
         gs.addCollidable(left);
         gs.addCollidable(right);
 
-        Ball ball = new Ball(WIDTH / 3, HEIGHT * 1 / 2, ballDiameter, ballColor, ballXVel, ballYVel, ballSpeedIncreaseRatio, topBallSpeed);
+        ball = new Ball(ballX, ballY, ballDiameter, ballColor, ballXVel, ballYVel, ballSpeedIncreaseRatio, topBallSpeed);
         Paddle paddle = new Paddle(WIDTH / 2, paddleY, paddleW, paddleH, paddleColor, paddleSpeed);
         gs.addCollidable(ball);
         gs.addRenderable(ball);
@@ -123,6 +128,11 @@ public class Breakout extends Application {
                 }
             }
         });
+        scene.setOnMouseMoved(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                paddle.setX(event.getX() - paddle.getW() / 2);
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -138,6 +148,10 @@ public class Breakout extends Application {
             gc.fillRect(0, 0, WIDTH, HEIGHT);
 
             gs.collideAll();
+            if (ball.hitTopSide(bottom)) {
+                ball.setX(ballX);
+                ball.setY(ballY);
+            }
             gs.updateAll();
             gs.drawAll(canvas);
         }
