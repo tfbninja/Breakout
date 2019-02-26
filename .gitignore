@@ -1,3 +1,5 @@
 /Breakout/nbproject/private/
 /Breakout/build/
 /Breakout/dist/
+*.TXT
+*.xml
